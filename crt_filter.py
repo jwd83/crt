@@ -96,37 +96,59 @@ class CrtFilter:
         self.ctx.viewport = (0, 0, self.width, self.height)
 
         # Compile shader program
-        self.prog = self.ctx.program(vertex_shader=VERT_SHADER,
-                                     fragment_shader=FRAG_SHADER)
+        self.prog = self.ctx.program(
+            vertex_shader=VERT_SHADER, fragment_shader=FRAG_SHADER
+        )
 
         # Fullscreen quad
-        verts = np.array([
-            -1.0, -1.0, 0.0, 0.0,
-             1.0, -1.0, 1.0, 0.0,
-            -1.0,  1.0, 0.0, 1.0,
-             1.0, -1.0, 1.0, 0.0,
-             1.0,  1.0, 1.0, 1.0,
-            -1.0,  1.0, 0.0, 1.0,
-        ], dtype='f4')
+        verts = np.array(
+            [
+                -1.0,
+                -1.0,
+                0.0,
+                0.0,
+                1.0,
+                -1.0,
+                1.0,
+                0.0,
+                -1.0,
+                1.0,
+                0.0,
+                1.0,
+                1.0,
+                -1.0,
+                1.0,
+                0.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                -1.0,
+                1.0,
+                0.0,
+                1.0,
+            ],
+            dtype="f4",
+        )
 
         vbo = self.ctx.buffer(verts.tobytes())
-        self.vao = self.ctx.simple_vertex_array(self.prog, vbo, 'in_pos', 'in_uv')
+        self.vao = self.ctx.simple_vertex_array(self.prog, vbo, "in_pos", "in_uv")
 
         # Texture (will be updated each frame)
-        self.texture = self.ctx.texture((self.width, self.height), 4, dtype='u1')
+        self.texture = self.ctx.texture((self.width, self.height), 4, dtype="u1")
         self.texture.filter = (moderngl.NEAREST, moderngl.NEAREST)
         self.texture.repeat_x = False
         self.texture.repeat_y = False
 
         # Set shader uniforms
-        self.prog['screen_tex'] = 0
-        self.prog['resolution'].value = (float(self.width), float(self.height))
+        self.prog["screen_tex"] = 0
+        self.prog["resolution"].value = (float(self.width), float(self.height))
 
         self.start_time = time.time()
 
     def _surf_to_bytes(self, surf: pygame.Surface) -> bytes:
         """Convert Pygame surface to RGBA bytes (flipped)."""
-        return pygame.image.tostring(surf, 'RGBA', True)
+        return pygame.image.tostring(surf, "RGBA", True)
 
     def draw(self, frame: pygame.Surface):
         """
@@ -139,8 +161,8 @@ class CrtFilter:
         # Clear and render the shader
         self.ctx.clear(0.0, 0.0, 0.0, 1.0)
         self.texture.use(location=0)
-        self.prog['time'].value = float(time.time() - self.start_time)
-        self.prog['resolution'].value = (float(self.width), float(self.height))
+        self.prog["time"].value = float(time.time() - self.start_time)
+        self.prog["resolution"].value = (float(self.width), float(self.height))
         self.vao.render(moderngl.TRIANGLES)
 
         # Swap buffers
